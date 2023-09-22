@@ -1,39 +1,35 @@
+import openai
 import streamlit as st
-from datetime import time, datetime
 
-st.header('st.slider')
+api_key = st.text_input('openai api key')
+if api_key:
+    openai.api_key = api_key
 
-# Example 1
+lang_list = ('영어', '중국어', '일본어', '아랍어', '한국어')
 
-st.subheader('Slider')
+st.header('번역기')
 
-age = st.slider('How old are you?', 0, 130, 25)
-st.write("I'm ", age, 'years old')
+col1, col2 = st.columns(2)
+result = ''
+with col1:
+    option = st.selectbox('Lang', lang_list)
+    q = st.text_area('From')
+    if q:
 
-# Example 2
+				# :+:+:+:+: prompt format 을 만들어보세요 :+:+:+:+:
+				# option = 영어, 중국어.. 중 하나 
+				# q = 입력 문구
+        prompt = q # <- 코드를 수정하세요
 
-st.subheader('Range slider')
+        response = openai.Completion.create(
+            model='text-davinci-003',
+            prompt=prompt,
+            temperature=0,
+            max_tokens=100,
+            top_p=1,
+        )
+        print(response.choices[0].text.strip())
+        result = response.choices[0].text.strip()
 
-values = st.slider(
-     'Select a range of values',
-     0.0, 100.0, (25.0, 75.0))
-st.write('Values:', values)
-
-# Example 3
-
-st.subheader('Range time slider')
-
-appointment = st.slider(
-     "Schedule your appointment:",
-     value=(time(11, 30), time(12, 45)))
-st.write("You're scheduled for:", appointment)
-
-# Example 4
-
-st.subheader('Datetime slider')
-
-start_time = st.slider(
-     "When do you start?",
-     value=datetime(2020, 1, 1, 9, 30),
-     format="MM/DD/YY - hh:mm")
-st.write("Start time:", start_time)
+with col2:
+    st.text_area('To', value=result)
